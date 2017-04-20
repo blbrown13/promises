@@ -1,7 +1,7 @@
 /**
  * Create the promise returning `Async` suffixed versions of the functions below,
  * Promisify them if you can, otherwise roll your own promise returning function
- */ 
+ */
 
 var fs = require('fs');
 var request = require('request');
@@ -27,7 +27,13 @@ var getGitHubProfile = function(user, callback) {
   });
 };
 
-var getGitHubProfileAsync; // TODO
+var getGitHubProfileAsync = Promise.promisify(getGitHubProfile);
+// getGitHubProfileAsync(user, callback)
+//   .then( function(res){
+//
+//   }).catch(function(err){
+//
+//   });
 
 
 // (2) Asyncronous token generation
@@ -38,14 +44,14 @@ var generateRandomToken = function(callback) {
   });
 };
 
-var generateRandomTokenAsync; // TODO
+var generateRandomTokenAsync = Promise.promisify(generateRandomToken); // TODO
 
 
 // (3) Asyncronous file manipulation
-var readFileAndMakeItFunny = function(filePath, callback) {
-  fs.readFile(filePath, 'utf8', function(err, file) {
+var readFileAndMakeItFunnyOld = function(filePath, callback) {
+   fs.readFile(filePath, 'utf8', function(err, file) {
     if (err) { return callback(err); }
-   
+
     var funnyFile = file.split('\n')
       .map(function(line) {
         return line + ' lol';
@@ -56,9 +62,23 @@ var readFileAndMakeItFunny = function(filePath, callback) {
   });
 };
 
-var readFileAndMakeItFunnyAsync; // TODO
 
-// Export these functions so we can test them and reuse them in later exercises
+var readFileAndMakeItFunnyAsync = function(filePath) {
+  return new Promise(function(resolve, reject) {
+    fs.readFile(filePath, 'utf8', function(err, file){
+      if (err) { return reject(err); }
+
+      var funnyFile = file.split('\n')
+      .map(function(line) {
+          return line + ' lol';
+        })
+        .join('\n');
+      resolve(funnyFile);
+
+    });
+  });
+};
+
 module.exports = {
   getGitHubProfileAsync: getGitHubProfileAsync,
   generateRandomTokenAsync: generateRandomTokenAsync,
